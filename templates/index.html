@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>YouTube Video Downloader</title>
+</head>
+
+<body>
+    <div class="container">
+        <h1>YouTube Video Downloader</h1>
+        <form method="POST" action="/download">
+            <div class="form-group">
+                <label for="video_url">YouTube Video URL:</label>
+                <input type="text" class="form-control" id="video_url" name="video_url" required>
+            </div>
+            <!-- Dropdown menu for video quality and format selection -->
+            <div class="form-group">
+                <label for="video_quality">Video Quality and Format:</label>
+                <select class="form-control" id="option_list" name="selected_stream" disabled>
+                    <optgroup label="------video" id="video_group" disabled>
+                        <option value="" selected>------ Please enter your YouTube Video URL ------</option>
+                    </optgroup>
+                    <optgroup label="------audio" id="audio_group" disabled>
+                    </optgroup>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Download</button>
+        </form>
+        <!-- Display download message or errors here -->
+        {% if message %}
+            {% if errorType == 0 %}
+            <div class="alert alert-success" role="alert">
+                {{ message }}
+            </div>
+            {% elif errorType == 1 %}
+            <div class="alert alert-danger" role="alert">
+                {{ message }}
+            </div>
+            {% elif errorType == 2 %}
+            <div class="alert alert-warning" role="alert">
+                {{ message }}
+            </div>
+            {% endif %}
+        {% endif %}
+
+        <div class="alert" id="message" style="display: none;" role="alert"></div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</body>
+
+</html>
