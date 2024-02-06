@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, redirect, render_template, jsonify
 from pytube import YouTube
 from pathlib import Path
 import os
@@ -10,20 +10,15 @@ def index():
     return render_template('index.html')
 
 @app.route("/download", methods=["GET", "POST"])
-def downloadVideo():
-    message = ''
-    errorType = 0
-    
+def download_video():
     if request.method == 'POST' and 'video_url' in request.form:
-        youtubeUrl = request.form["video_url"]
-        if youtubeUrl:
-            url = YouTube(youtubeUrl)
+        youtube_url = request.form["video_url"]
+        if youtube_url:
+            url = YouTube(youtube_url)
             
-            # 获取用户选择的清晰度和格式
             selected_quality = request.form['selected_stream']
             selected_stream = None
             
-            # 根据用户选择的清晰度和格式筛选视频流
             for stream in url.streams:
                 value = f"{stream}"
                 if value == selected_quality:
@@ -31,20 +26,21 @@ def downloadVideo():
                     break
             
             if selected_stream:
-                downloadFolder = str(os.path.join(Path.home(), "Downloads"))
-                if selected_stream.resolution:
-                    selected_stream.download(output_path=downloadFolder, filename_prefix=f"{selected_stream.resolution}_")
-                else:
-                    selected_stream.download(output_path=downloadFolder, filename_prefix=f"{selected_stream.abr}_")
-                message = f'Video Downloaded Successfully in {downloadFolder}!'
-                errorType = 0
+                # 构建直接下载链接
+                direct_download_link = selected_stream.url
+                return render_template('download.html', direct_download_link=direct_download_link)
             else:
                 message = 'Selected stream is not available for download'
-                errorType = 1
+                return render_template('index.html', message=message)
         else:
             message = 'Please enter YouTube Video URL.'
-            errorType = 2
-    return render_template('index.html', message=message, errorType=errorType)
+            return render_template('index.html', message=message)
+    return render_template('index.html')
+
+@app.route("/redirect_download", methods=["GET"])
+def redirect_download():
+    direct_download_link = request.args.get('url', '')
+    return redirect(direct_download_link)
 
 @app.route("/get_quality", methods=["GET"])
 def get_quality():
